@@ -1,60 +1,89 @@
-import { mediaquery } from '@kit.ArkUI';
+interface IObj {
+  name: string,
+  age: number
+}
 
 @Entry
 @Component
 struct Index {
-  @State col01Width: string = '20%';
-  @State col02Width: string = '60%';
-  @State col03Width: string = '20%';
-  // 帮我们去监听屏幕
-  smListener = mediaquery.matchMediaSync('screen and (width>=320vp) and (width<=600vp)')
-  mdListener = mediaquery.matchMediaSync('screen and (width>=600vp) and (width<=840vp)')
-  lgListener = mediaquery.matchMediaSync('screen and (width>=840vp)')
-
-  // 组件的生命周期方法：组件即将显示 aboutToAppear
-  aboutToAppear(): void {
-    console.log("组件即将显示")
-    this.smListener.on('change', (result) => {
-      if (result.matches) {
-        console.log('当匹配到 sm 屏')
-      }
-      this.col01Width = '100%';
-      this.col02Width = '100%';
-      this.col03Width = '100%';
-    })
-
-    this.mdListener.on('change', (result) => {
-      if (result.matches) {
-        console.log('当匹配到 md 屏')
-        this.col01Width = '10%';
-        this.col02Width = '80%';
-        this.col03Width = '10%';
-      }
-    })
-
-    this.lgListener.on('change', (result) => {
-      if (result.matches) {
-        console.log('当匹配到 lg 屏')
-        this.col01Width = '20%';
-        this.col02Width = '60%';
-        this.col03Width = '20%';
-      }
-    })
+  @Builder
+  Components() {
+    Text("组件")
   }
 
+  @State x: number = 40;
+  @State y: number = -30;
+  @State num: number = 0
+  @State @Watch('transformTime') now: number = Date.now()
+  @State obj: IObj = { name: '李思思', age: 18 }
+
+  transformTime() {
+    console.log(`${this.now} 监听变化`)
+  }
+
+  @State str: string = ""
+  @State isAgree: boolean = false
+  @State arr: string[] = ["哈哈哈", "呵呵呵", "啊啊啊"]
+
   build() {
-    Flex({wrap: FlexWrap.Wrap}) {
-      Column() {
-        Text('左侧文本内容').backgroundColor(Color.Yellow).width(this.col01Width)
+    Column() {
+      Image($rawfile('01.jpg')).width(200).borderWidth(1).translate({ x: this.x, y: this.y })// onTouch 有三个阶段
+        .onTouch(event => {
+          if (event.type === TouchType.Down) {
+            console.log('开始触摸');
+          }
+
+          if (event.type === TouchType.Move) {
+            console.log('移动触摸', event.touches[0].x, event.touches[0].y);
+            this.x = event.touches[0].x;
+            this.y = event.touches[0].y;
+          }
+
+          if (event.type === TouchType.Up) {
+            console.log('结束触摸');
+          }
+        })
+      Divider().margin({ bottom: 10 })
+      TextInput().borderWidth(1)
+      Divider().margin({ bottom: 10 })
+      Row() {
+        Button('+ 1').onClick(() => this.num = this.num + 1)
+        Text(`${this.num}`)
       }
 
-      Column() {
-        Text('中间文本内容').backgroundColor(Color.Gray).width(this.col02Width)
-      }
+      Divider()
+      this.Components()
+      Divider()
+      Text("数据监听")
+      Text(`当前系统时间: ${this.now} `).onClick(() => {
+        this.now = Date.now()
+      })
 
-      Column() {
-        Text('右侧文本内容').backgroundColor(Color.Orange).width(this.col03Width)
-      }
-    }.width('100%')
+      Divider()
+      Text('对象')
+      Text(`${this.obj.age}`).onClick(() => {
+        this.obj.age = this.obj.age + 1
+      })
+
+      Divider()
+      Text('输入框' + this.str)
+      // $$this.str 就是双向绑定
+      TextInput({
+        placeholder: '请输入',
+        text: $$this.str
+      })
+      Divider()
+      Text('用户勾选')
+      Checkbox().select($$this.isAgree)
+      Text("用户是否同意")
+      Text(`${this.isAgree ? 'Yes' : 'No'}`)
+      Divider()
+      Text('循环渲染')
+      ForEach(this.arr, (item: string) => {
+        Button(`${item}`)
+      }, (item: string, index: number) => {
+        return item + index
+      })
+    }
   }
 }
