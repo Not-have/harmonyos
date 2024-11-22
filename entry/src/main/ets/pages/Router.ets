@@ -1,9 +1,15 @@
+import { router } from '@kit.ArkUI'
+
 @Entry
 @Component
 struct Router {
   build() {
     Column() {
-      Text("路由")
+      Text("list").onClick(() => {
+        router.pushUrl({
+          url: "pages/RouterDetail"
+        })
+      })
     }
   }
 }
