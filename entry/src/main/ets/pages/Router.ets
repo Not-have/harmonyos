@@ -20,6 +20,7 @@ struct Router {
             id: "test"
           }
         }, router.RouterMode.Single) // 单例模式
+
       })
 
 

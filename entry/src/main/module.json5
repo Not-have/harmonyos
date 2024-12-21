@@ -1,5 +1,7 @@
 {
   "module": {
+    // 每个应用模块，都对应一个 AbilityStage
+    "srcEntry": "./ets/abilitystage/DemoAbilityStage01.ets",
     "name": "entry",
     "type": "entry",
     "description": "$string:module_desc",
